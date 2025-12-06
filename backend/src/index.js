@@ -10,12 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: [
-        "http://localhost:5173", 
-        "https://truestate-backend-neon.vercel.app"
-    ],
-    credentials: true
+    origin: "*", 
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
 
 app.use('/api/transactions', transactionRoutes);
