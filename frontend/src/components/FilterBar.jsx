@@ -3,9 +3,23 @@ import { RotateCcw, ChevronDown } from 'lucide-react';
 
 const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   
-  // Static options for filters that don't need Database data
+  // --- FIX: Define Fallback Defaults ---
+  // If the backend returns empty arrays, these values will be shown instead.
+  const defaults = {
+    regions: ["North", "South", "East", "West"],
+    categories: ["Clothing", "Electronics", "Home", "Beauty", "Sports"],
+    paymentMethods: ["Credit Card", "PayPal", "UPI", "Cash", "Debit Card"],
+    tags: ["Sale", "New", "Discounted", "Popular"]
+  };
+
+  // Static options (Age & Date)
   const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
   const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
+
+  // Helper to choose between Real API data or Default Fallback
+  const getOptions = (apiData, fallbackData) => {
+    return (apiData && apiData.length > 0) ? apiData : fallbackData;
+  };
 
   return (
     <div className="bg-white p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center shadow-sm z-10">
@@ -18,15 +32,15 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         <RotateCcw size={16} />
       </button>
 
-      {/* 1. Customer Region (Data comes from Backend) */}
+      {/* 1. Customer Region (With Fallback) */}
       <FilterSelect 
         label="Customer Region" 
         value={filters.region} 
         onChange={(val) => onFilterChange('region', val)}
-        options={options.regions || []} 
+        options={getOptions(options.regions, defaults.regions)} 
       />
       
-      {/* 2. Gender (Static) */}
+      {/* 2. Gender */}
       <FilterSelect 
         label="Gender" 
         value={filters.gender} 
@@ -34,7 +48,7 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={['Male', 'Female']}
       />
 
-      {/* 3. Age Range (Static) */}
+      {/* 3. Age Range */}
       <FilterSelect 
         label="Age Range" 
         value={filters.ageRange} 
@@ -42,31 +56,31 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
-      {/* 4. Product Category (Data comes from Backend) */}
+      {/* 4. Product Category (With Fallback) */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
         onChange={(val) => onFilterChange('category', val)}
-        options={options.categories || []}
+        options={getOptions(options.categories, defaults.categories)}
       />
 
-      {/* 5. Tags (Data comes from Backend) */}
+      {/* 5. Tags (With Fallback) */}
       <FilterSelect 
         label="Tags" 
         value={filters.tags} 
         onChange={(val) => onFilterChange('tags', val)}
-        options={options.tags || []} 
+        options={getOptions(options.tags, defaults.tags)} 
       />
 
-      {/* 6. Payment Method (Data comes from Backend) */}
+      {/* 6. Payment Method (With Fallback) */}
       <FilterSelect 
         label="Payment Method" 
         value={filters.paymentMethod} 
         onChange={(val) => onFilterChange('paymentMethod', val)}
-        options={options.paymentMethods || []}
+        options={getOptions(options.paymentMethods, defaults.paymentMethods)}
       />
 
-      {/* 7. Date (Static) */}
+      {/* 7. Date */}
       <FilterSelect 
         label="Date" 
         value={filters.dateRange} 
@@ -74,7 +88,7 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={dateRanges} 
       />
       
-      {/* Sort Dropdown (Right Aligned) */}
+      {/* Sort Dropdown */}
       <div className="ml-auto flex items-center gap-2">
         <span className="text-sm text-gray-500 hidden sm:inline">Sort by:</span>
         <select 
