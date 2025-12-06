@@ -3,11 +3,13 @@ import { RotateCcw, ChevronDown } from 'lucide-react';
 
 const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   
+  // Static options for filters that don't need Database data
   const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
   const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
 
   return (
     <div className="bg-white p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center shadow-sm z-10">
+      {/* Reset Button */}
       <button 
         onClick={onReset}
         className="p-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 rounded-full transition-colors"
@@ -16,13 +18,15 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         <RotateCcw size={16} />
       </button>
 
+      {/* 1. Customer Region (Data comes from Backend) */}
       <FilterSelect 
         label="Customer Region" 
         value={filters.region} 
         onChange={(val) => onFilterChange('region', val)}
-        options={options.regions}
+        options={options.regions || []} 
       />
       
+      {/* 2. Gender (Static) */}
       <FilterSelect 
         label="Gender" 
         value={filters.gender} 
@@ -30,6 +34,7 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={['Male', 'Female']}
       />
 
+      {/* 3. Age Range (Static) */}
       <FilterSelect 
         label="Age Range" 
         value={filters.ageRange} 
@@ -37,29 +42,31 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
+      {/* 4. Product Category (Data comes from Backend) */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
         onChange={(val) => onFilterChange('category', val)}
-        options={options.categories}
+        options={options.categories || []}
       />
 
-      {/* Tags Filter - Uses options.tags from backend */}
+      {/* 5. Tags (Data comes from Backend) */}
       <FilterSelect 
         label="Tags" 
         value={filters.tags} 
         onChange={(val) => onFilterChange('tags', val)}
-        options={options.tags} 
+        options={options.tags || []} 
       />
 
+      {/* 6. Payment Method (Data comes from Backend) */}
       <FilterSelect 
         label="Payment Method" 
         value={filters.paymentMethod} 
         onChange={(val) => onFilterChange('paymentMethod', val)}
-        options={options.paymentMethods}
+        options={options.paymentMethods || []}
       />
 
-      {/* Date Filter - Uses new static ranges */}
+      {/* 7. Date (Static) */}
       <FilterSelect 
         label="Date" 
         value={filters.dateRange} 
@@ -67,7 +74,7 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={dateRanges} 
       />
       
-      {/* Sort Dropdown */}
+      {/* Sort Dropdown (Right Aligned) */}
       <div className="ml-auto flex items-center gap-2">
         <span className="text-sm text-gray-500 hidden sm:inline">Sort by:</span>
         <select 
@@ -98,6 +105,7 @@ const FilterSelect = ({ label, value, onChange, options = [] }) => (
         <option key={opt} value={opt}>{opt}</option>
       ))}
     </select>
+    {/* Custom Dropdown Arrow */}
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <ChevronDown size={12} />
     </div>
