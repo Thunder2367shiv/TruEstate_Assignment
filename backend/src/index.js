@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
     origin: [
         "http://localhost:5173", 
-        "https://your-frontend-project.vercel.app"
+        "https://truestate-backend-neon.vercel.app"
     ],
     credentials: true
 }));
