@@ -3,35 +3,43 @@ import { RotateCcw, ChevronDown } from 'lucide-react';
 
 const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   
-  // 1. Define the relationship between Categories and Tags
-  // This acts as a filter: "If Category X is selected, only show these tags"
+  // 1. Define Fallback Defaults (Guarantees dropdowns are never empty)
+  const defaults = {
+    regions: ["North", "South", "East", "West", "Central"],
+    categories: ["Clothing", "Electronics", "Beauty"],
+    paymentMethods: ["Credit Card", "Wallet", "UPI", "Cash", "Debit Card", "Net Banking"],
+    tags: ["Sale", "New", "Discounted", "Popular", "organic", "skincare", "makeup", "fragrance-free", "unisex", "cotton", "fashion", "casual", "formal", "smart"]
+  };
+
+  const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
+  const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
+
+  // 2. Helper: Prefer Backend Data, but fallback to Defaults if empty
+  const getOptions = (apiData, fallbackData) => {
+    return (apiData && apiData.length > 0) ? apiData : fallbackData;
+  };
+
+  // 3. Smart Tag Logic (Now works even if using Default tags)
   const categoryTagsMap = {
     "Beauty": ["organic", "skincare", "makeup", "fragrance-free"],
     "Clothing": ["unisex", "cotton", "fashion", "casual", "formal"],
-    "Electronics": ["smart"], // Add more if needed
+    "Electronics": ["smart"],
   };
 
-  // 2. Logic to calculate which tags to show
   const visibleTags = useMemo(() => {
-    // If no tags loaded from backend yet, return empty
-    if (!options.tags || options.tags.length === 0) return [];
+    // Step A: Get the master list of tags (API or Defaults)
+    const allTags = getOptions(options.tags, defaults.tags);
 
-    // If a category is selected (e.g., "Beauty")
-    if (filters.category) {
-      const allowedTags = categoryTagsMap[filters.category];
-      if (allowedTags) {
-        // Only show tags that are BOTH in the backend list AND in our allowed list
-        return options.tags.filter(tag => allowedTags.includes(tag));
-      }
+    // Step B: Filter based on selected category
+    if (filters.category && categoryTagsMap[filters.category]) {
+       const allowedTags = categoryTagsMap[filters.category];
+       // Return tags that match the category
+       return allTags.filter(tag => allowedTags.includes(tag));
     }
     
-    // If no category selected, show ALL tags from the backend
-    return options.tags;
+    // Step C: If no category selected, show ALL tags
+    return allTags;
   }, [filters.category, options.tags]);
-
-  // Static options
-  const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
-  const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
 
   return (
     <div className="bg-white p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center shadow-sm z-10">
@@ -43,12 +51,12 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         <RotateCcw size={16} />
       </button>
 
-      {/* 1. Customer Region (Direct from Backend) */}
+      {/* 1. Customer Region */}
       <FilterSelect 
         label="Customer Region" 
         value={filters.region} 
         onChange={(val) => onFilterChange('region', val)}
-        options={options.regions || []} 
+        options={getOptions(options.regions, defaults.regions)} 
       />
       
       {/* 2. Gender */}
@@ -67,28 +75,28 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
-      {/* 4. Product Category (Direct from Backend) */}
+      {/* 4. Product Category */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
         onChange={(val) => onFilterChange('category', val)}
-        options={options.categories || []}
+        options={getOptions(options.categories, defaults.categories)}
       />
 
-      {/* 5. Tags (SMART FILTER APPLIED HERE) */}
+      {/* 5. Tags (Smart Filtered) */}
       <FilterSelect 
         label="Tags" 
         value={filters.tags} 
         onChange={(val) => onFilterChange('tags', val)}
-        options={visibleTags} // Uses the filtered list based on category
+        options={visibleTags} 
       />
 
-      {/* 6. Payment Method (Direct from Backend) */}
+      {/* 6. Payment Method */}
       <FilterSelect 
         label="Payment Method" 
         value={filters.paymentMethod} 
         onChange={(val) => onFilterChange('paymentMethod', val)}
-        options={options.paymentMethods || []}
+        options={getOptions(options.paymentMethods, defaults.paymentMethods)}
       />
 
       {/* 7. Date */}
