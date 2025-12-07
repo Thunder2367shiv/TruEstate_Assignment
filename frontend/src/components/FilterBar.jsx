@@ -1,29 +1,40 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { RotateCcw, ChevronDown } from 'lucide-react';
 
 const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   
-  // --- FIX: Define Fallback Defaults ---
-  // If the backend returns empty arrays, these values will be shown instead.
-  const defaults = {
-    regions: ["North", "South", "East", "West"],
-    categories: ["Clothing", "Electronics", "Home", "Beauty", "Sports"],
-    paymentMethods: ["Credit Card", "PayPal", "UPI", "Cash", "Debit Card"],
-    tags: ["Sale", "New", "Discounted", "Popular"]
+  // 1. Define the relationship between Categories and Tags
+  // This acts as a filter: "If Category X is selected, only show these tags"
+  const categoryTagsMap = {
+    "Beauty": ["organic", "skincare", "makeup", "fragrance-free"],
+    "Clothing": ["unisex", "cotton", "fashion", "casual", "formal"],
+    "Electronics": ["smart"], // Add more if needed
   };
 
-  // Static options (Age & Date)
+  // 2. Logic to calculate which tags to show
+  const visibleTags = useMemo(() => {
+    // If no tags loaded from backend yet, return empty
+    if (!options.tags || options.tags.length === 0) return [];
+
+    // If a category is selected (e.g., "Beauty")
+    if (filters.category) {
+      const allowedTags = categoryTagsMap[filters.category];
+      if (allowedTags) {
+        // Only show tags that are BOTH in the backend list AND in our allowed list
+        return options.tags.filter(tag => allowedTags.includes(tag));
+      }
+    }
+    
+    // If no category selected, show ALL tags from the backend
+    return options.tags;
+  }, [filters.category, options.tags]);
+
+  // Static options
   const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
   const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
 
-  // Helper to choose between Real API data or Default Fallback
-  const getOptions = (apiData, fallbackData) => {
-    return (apiData && apiData.length > 0) ? apiData : fallbackData;
-  };
-
   return (
     <div className="bg-white p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center shadow-sm z-10">
-      {/* Reset Button */}
       <button 
         onClick={onReset}
         className="p-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 rounded-full transition-colors"
@@ -32,12 +43,12 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         <RotateCcw size={16} />
       </button>
 
-      {/* 1. Customer Region (With Fallback) */}
+      {/* 1. Customer Region (Direct from Backend) */}
       <FilterSelect 
         label="Customer Region" 
         value={filters.region} 
         onChange={(val) => onFilterChange('region', val)}
-        options={getOptions(options.regions, defaults.regions)} 
+        options={options.regions || []} 
       />
       
       {/* 2. Gender */}
@@ -56,28 +67,28 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
-      {/* 4. Product Category (With Fallback) */}
+      {/* 4. Product Category (Direct from Backend) */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
         onChange={(val) => onFilterChange('category', val)}
-        options={getOptions(options.categories, defaults.categories)}
+        options={options.categories || []}
       />
 
-      {/* 5. Tags (With Fallback) */}
+      {/* 5. Tags (SMART FILTER APPLIED HERE) */}
       <FilterSelect 
         label="Tags" 
         value={filters.tags} 
         onChange={(val) => onFilterChange('tags', val)}
-        options={getOptions(options.tags, defaults.tags)} 
+        options={visibleTags} // Uses the filtered list based on category
       />
 
-      {/* 6. Payment Method (With Fallback) */}
+      {/* 6. Payment Method (Direct from Backend) */}
       <FilterSelect 
         label="Payment Method" 
         value={filters.paymentMethod} 
         onChange={(val) => onFilterChange('paymentMethod', val)}
-        options={getOptions(options.paymentMethods, defaults.paymentMethods)}
+        options={options.paymentMethods || []}
       />
 
       {/* 7. Date */}
@@ -119,7 +130,6 @@ const FilterSelect = ({ label, value, onChange, options = [] }) => (
         <option key={opt} value={opt}>{opt}</option>
       ))}
     </select>
-    {/* Custom Dropdown Arrow */}
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <ChevronDown size={12} />
     </div>
