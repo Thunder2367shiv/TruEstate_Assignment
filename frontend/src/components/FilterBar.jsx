@@ -19,7 +19,7 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
     return (apiData && apiData.length > 0) ? apiData : fallbackData;
   };
 
-  // 3. Smart Tag Logic (Now works even if using Default tags)
+  // 3. Smart Tag Logic
   const categoryTagsMap = {
     "Beauty": ["organic", "skincare", "makeup", "fragrance-free"],
     "Clothing": ["unisex", "cotton", "fashion", "casual", "formal"],
@@ -27,17 +27,13 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   };
 
   const visibleTags = useMemo(() => {
-    // Step A: Get the master list of tags (API or Defaults)
     const allTags = getOptions(options.tags, defaults.tags);
 
-    // Step B: Filter based on selected category
     if (filters.category && categoryTagsMap[filters.category]) {
        const allowedTags = categoryTagsMap[filters.category];
-       // Return tags that match the category
        return allTags.filter(tag => allowedTags.includes(tag));
     }
     
-    // Step C: If no category selected, show ALL tags
     return allTags;
   }, [filters.category, options.tags]);
 
@@ -75,15 +71,18 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
-      {/* 4. Product Category */}
+      {/* 4. Product Category (THE FIX IS HERE) */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
-        onChange={(val) => onFilterChange('category', val)}
+        onChange={(val) => {
+            onFilterChange('category', val);
+            onFilterChange('tags', ''); // <--- FIX: Automatically clear tags when category changes
+        }}
         options={getOptions(options.categories, defaults.categories)}
       />
 
-      {/* 5. Tags (Smart Filtered) */}
+      {/* 5. Tags */}
       <FilterSelect 
         label="Tags" 
         value={filters.tags} 
