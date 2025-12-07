@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { RotateCcw, ChevronDown } from 'lucide-react';
+import { RotateCcw, ChevronDown, X } from 'lucide-react'; // Added 'X' icon if you want to use it later
 
 const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   
-  // 1. Define Fallback Defaults (Guarantees dropdowns are never empty)
+  // 1. Fallback Defaults
   const defaults = {
     regions: ["North", "South", "East", "West", "Central"],
     categories: ["Clothing", "Electronics", "Beauty"],
@@ -14,12 +14,11 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
   const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
 
-  // 2. Helper: Prefer Backend Data, but fallback to Defaults if empty
   const getOptions = (apiData, fallbackData) => {
     return (apiData && apiData.length > 0) ? apiData : fallbackData;
   };
 
-  // 3. Smart Tag Logic
+  // 2. Smart Tag Logic
   const categoryTagsMap = {
     "Beauty": ["organic", "skincare", "makeup", "fragrance-free"],
     "Clothing": ["unisex", "cotton", "fashion", "casual", "formal"],
@@ -28,12 +27,10 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
 
   const visibleTags = useMemo(() => {
     const allTags = getOptions(options.tags, defaults.tags);
-
     if (filters.category && categoryTagsMap[filters.category]) {
        const allowedTags = categoryTagsMap[filters.category];
        return allTags.filter(tag => allowedTags.includes(tag));
     }
-    
     return allTags;
   }, [filters.category, options.tags]);
 
@@ -71,13 +68,13 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
-      {/* 4. Product Category (THE FIX IS HERE) */}
+      {/* 4. Product Category */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
         onChange={(val) => {
             onFilterChange('category', val);
-            onFilterChange('tags', ''); // <--- FIX: Automatically clear tags when category changes
+            onFilterChange('tags', ''); // Reset tags when category changes
         }}
         options={getOptions(options.categories, defaults.categories)}
       />
@@ -112,7 +109,7 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         <select 
           className="text-sm font-medium border-none focus:ring-0 cursor-pointer text-gray-700 bg-transparent hover:text-green-700 outline-none"
           onChange={(e) => onFilterChange('sortBy', e.target.value)}
-          value={filters.sortBy}
+          value={filters.sortBy || "date"}
         >
           <option value="name">Customer Name (A-Z)</option>
           <option value="date">Date (Newest)</option>
@@ -123,20 +120,33 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   );
 };
 
+// --- IMPROVED FILTER SELECT COMPONENT ---
 const FilterSelect = ({ label, value, onChange, options = [] }) => (
-  <div className="relative">
+  <div className="relative group">
     <select 
-      value={value} 
+      value={value || ""} 
       onChange={(e) => onChange(e.target.value)}
-      className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none focus:border-gray-400 transition-shadow bg-gray-50 hover:bg-gray-100 cursor-pointer ${
-        value ? 'border-green-500 text-green-700 bg-green-50' : 'border-gray-200 text-gray-600'
+      className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none focus:border-gray-400 transition-shadow cursor-pointer ${
+        value 
+          ? 'border-green-500 text-green-700 bg-green-50' // Active Style
+          : 'border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100' // Inactive Style
       }`}
     >
-      <option value="">{label}</option>
+      {/* FIX: Added "(All)" to make it clear this option resets the filter.
+         This ensures the user knows they can click it to go back.
+      */}
+      <option value="" className="text-gray-400">
+        {value ? `All ${label}s` : label}
+      </option>
+      
       {options.map((opt) => (
-        <option key={opt} value={opt}>{opt}</option>
+        <option key={opt} value={opt} className="text-gray-900">
+          {opt}
+        </option>
       ))}
     </select>
+    
+    {/* Dropdown Arrow */}
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <ChevronDown size={12} />
     </div>
