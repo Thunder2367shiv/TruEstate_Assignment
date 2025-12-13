@@ -7,7 +7,7 @@ const Navbar = ({ onSearch }) => {
       <h1 className="text-xl font-bold text-gray-800">Sales Management System</h1>
       
       <div className="flex items-center gap-4">
-        {/* Search Bar */}
+        
         <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600" size={18} />
           <input 

@@ -49,7 +49,6 @@ const TransactionTable = ({ data, loading }) => {
               <td className="px-6 py-4 text-gray-900 font-medium text-sm">
                 {item.customer.name}
               </td>
-              {/* Phone with Paperclip Icon */}
               <td className="px-6 py-4 text-gray-500 text-xs font-mono flex items-center gap-2">
                 {item.customer.phone}
                 <Paperclip size={12} className="text-gray-400 rotate-45" />
@@ -60,11 +59,9 @@ const TransactionTable = ({ data, loading }) => {
               <td className="px-6 py-4 text-gray-600 text-sm">
                 {item.customer.age}
               </td>
-              {/* Bold Category */}
               <td className="px-6 py-4 text-gray-900 font-bold text-sm">
                 {item.product.category}
               </td>
-              {/* Bold Quantity "01" */}
               <td className="px-6 py-4 text-gray-900 font-bold pl-8 text-sm">
                 {item.sales.quantity.toString().padStart(2, '0')}
               </td>

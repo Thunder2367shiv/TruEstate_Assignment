@@ -23,7 +23,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <div className="flex items-center justify-center gap-2 py-6 bg-white border-t border-gray-200">
-      {/* Previous Button */}
+      
       <button 
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
@@ -32,7 +32,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <ChevronLeft size={20} />
       </button>
 
-      {/* Page Numbers */}
       {visiblePages.map((pageNum) => (
         <button
           key={pageNum}

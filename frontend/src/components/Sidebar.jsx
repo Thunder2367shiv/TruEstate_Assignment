@@ -7,7 +7,7 @@ const Sidebar = () => {
 
   return (
     <div className="w-64 bg-gray-50 h-screen border-r border-gray-200 hidden md:flex flex-col sticky top-0 font-sans z-20 shrink-0">
-      {/* Logo Section */}
+      
       <div className="h-16 flex items-center px-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
@@ -20,13 +20,11 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Menu Items */}
       <nav className="flex-1 py-5 space-y-1 overflow-y-auto custom-scrollbar">
         <NavItem icon={<LayoutDashboard size={18} />} label="Dashboard" />
         <NavItem icon={<Users size={18} />} label="Nexus" />
         <NavItem icon={<PlayCircle  size={18} />} label="Intake" />
 
-        {/* Services Dropdown Header */}
         <div className='bg-white m-2 rounded-2xl'>
           <button
             onClick={() => setIsServicesOpen(!isServicesOpen)}
@@ -36,10 +34,8 @@ const Sidebar = () => {
             {isServicesOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
           </button>
 
-          {/* Services List (Collapsible) */}
           {isServicesOpen && (
             <div className="space-y-0 px-6">
-              {/* Active Item: Pre-active */}
               <div className="relative group">
                 <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r"></div>
                 <button className="w-full flex items-center gap-3 px-6 py-1.5 text-sm font-medium  text-gray-500">
@@ -54,7 +50,6 @@ const Sidebar = () => {
           )}
         </div>
 
-        {/* Invoices Dropdown Header */}
         
         <div className='bg-white m-2 rounded-2xl'>
         <button
@@ -82,7 +77,6 @@ const Sidebar = () => {
       </div>
       </nav>
 
-      {/* User Profile */}
       <div className="p-4 border-t border-gray-100 mt-auto">
         <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-100">
           <div className="w-8 h-8 rounded-full bg-gray-300 border border-white shadow-sm" />

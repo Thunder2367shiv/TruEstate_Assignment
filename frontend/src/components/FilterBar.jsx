@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { RotateCcw, ChevronDown, X } from 'lucide-react'; // Added 'X' icon if you want to use it later
+import { RotateCcw, ChevronDown, X } from 'lucide-react'; 
 
 const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   
-  // 1. Fallback Defaults
   const defaults = {
     regions: ["North", "South", "East", "West", "Central"],
     categories: ["Clothing", "Electronics", "Beauty"],
@@ -18,7 +17,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
     return (apiData && apiData.length > 0) ? apiData : fallbackData;
   };
 
-  // 2. Smart Tag Logic
   const categoryTagsMap = {
     "Beauty": ["organic", "skincare", "makeup", "fragrance-free"],
     "Clothing": ["unisex", "cotton", "fashion", "casual", "formal"],
@@ -44,7 +42,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         <RotateCcw size={16} />
       </button>
 
-      {/* 1. Customer Region */}
       <FilterSelect 
         label="Customer Region" 
         value={filters.region} 
@@ -52,7 +49,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={getOptions(options.regions, defaults.regions)} 
       />
       
-      {/* 2. Gender */}
       <FilterSelect 
         label="Gender" 
         value={filters.gender} 
@@ -60,7 +56,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={['Male', 'Female']}
       />
 
-      {/* 3. Age Range */}
       <FilterSelect 
         label="Age Range" 
         value={filters.ageRange} 
@@ -68,18 +63,16 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={ageRanges} 
       />
 
-      {/* 4. Product Category */}
       <FilterSelect 
         label="Product Category" 
         value={filters.category} 
         onChange={(val) => {
             onFilterChange('category', val);
-            onFilterChange('tags', ''); // Reset tags when category changes
+            onFilterChange('tags', ''); 
         }}
         options={getOptions(options.categories, defaults.categories)}
       />
 
-      {/* 5. Tags */}
       <FilterSelect 
         label="Tags" 
         value={filters.tags} 
@@ -87,7 +80,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={visibleTags} 
       />
 
-      {/* 6. Payment Method */}
       <FilterSelect 
         label="Payment Method" 
         value={filters.paymentMethod} 
@@ -95,7 +87,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={getOptions(options.paymentMethods, defaults.paymentMethods)}
       />
 
-      {/* 7. Date */}
       <FilterSelect 
         label="Date" 
         value={filters.dateRange} 
@@ -103,7 +94,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
         options={dateRanges} 
       />
       
-      {/* Sort Dropdown */}
       <div className="ml-auto flex items-center gap-2">
         <span className="text-sm text-gray-500 hidden sm:inline">Sort by:</span>
         <select 
@@ -120,7 +110,6 @@ const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
   );
 };
 
-// --- IMPROVED FILTER SELECT COMPONENT ---
 const FilterSelect = ({ label, value, onChange, options = [] }) => (
   <div className="relative group">
     <select 
@@ -128,13 +117,10 @@ const FilterSelect = ({ label, value, onChange, options = [] }) => (
       onChange={(e) => onChange(e.target.value)}
       className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none focus:border-gray-400 transition-shadow cursor-pointer ${
         value 
-          ? 'border-green-500 text-green-700 bg-green-50' // Active Style
-          : 'border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100' // Inactive Style
+          ? 'border-green-500 text-green-700 bg-green-50' 
+          : 'border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100' 
       }`}
     >
-      {/* FIX: Added "(All)" to make it clear this option resets the filter.
-         This ensures the user knows they can click it to go back.
-      */}
       <option value="" className="text-gray-400">
         {value ? `All ${label}s` : label}
       </option>
@@ -146,7 +132,6 @@ const FilterSelect = ({ label, value, onChange, options = [] }) => (
       ))}
     </select>
     
-    {/* Dropdown Arrow */}
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <ChevronDown size={12} />
     </div>
