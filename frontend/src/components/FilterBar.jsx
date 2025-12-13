@@ -10,6 +10,16 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
     paymentMethods: ["Credit Card", "Wallet", "UPI", "Cash"],
   };
 
+  const ageRanges = ["0–18", "19–25", "26–35", "36–45", "46–60", "60+"];
+
+  const dateRanges = [
+    "Today",
+    "Last 7 Days",
+    "Last 30 Days",
+    "This Month",
+    "Last Month",
+  ];
+
   const categoryTagsMap = {
     Beauty: ["organic", "skincare", "makeup", "fragrance-free"],
     Clothing: ["unisex", "cotton", "fashion", "casual", "formal"],
@@ -49,15 +59,12 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
         onChange={(v) => onFilterChange("gender", v)}
       />
 
-      {/* Age Range */}
-      <RangeInput
-        label="Age"
-        start={filters.ageFrom}
-        end={filters.ageTo}
-        onChange={(from, to) => {
-          onFilterChange("ageFrom", from);
-          onFilterChange("ageTo", to);
-        }}
+      {/* Age Range (Selectable) */}
+      <FilterSelect
+        label="Age Range"
+        value={filters.ageRange}
+        options={ageRanges}
+        onChange={(v) => onFilterChange("ageRange", v)}
       />
 
       {/* Category */}
@@ -80,7 +87,7 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
         onChange={(v) => onFilterChange("tags", v)}
       />
 
-      {/* Payment Method */}
+      {/* Payment */}
       <FilterSelect
         label="Payment Method"
         value={filters.paymentMethod}
@@ -88,14 +95,12 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
         onChange={(v) => onFilterChange("paymentMethod", v)}
       />
 
-      {/* Date Range */}
-      <DateRangeInput
-        start={filters.startDate}
-        end={filters.endDate}
-        onChange={(from, to) => {
-          onFilterChange("startDate", from);
-          onFilterChange("endDate", to);
-        }}
+      {/* Date Range (Selectable) */}
+      <FilterSelect
+        label="Date Range"
+        value={filters.dateRange}
+        options={dateRanges}
+        onChange={(v) => onFilterChange("dateRange", v)}
       />
     </div>
   );
@@ -140,49 +145,6 @@ const FilterSelect = ({
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <ChevronDown size={12} />
     </div>
-  </div>
-);
-
-/* ===================== AGE RANGE ===================== */
-
-const RangeInput = ({ label, start, end, onChange }) => (
-  <div className="flex items-center gap-1 text-xs">
-    <span className="text-gray-500">{label}</span>
-    <input
-      type="number"
-      placeholder="From"
-      value={start || ""}
-      onChange={(e) => onChange(e.target.value, end)}
-      className="w-16 px-2 py-1 border rounded focus:outline-none"
-    />
-    <span>-</span>
-    <input
-      type="number"
-      placeholder="To"
-      value={end || ""}
-      onChange={(e) => onChange(start, e.target.value)}
-      className="w-16 px-2 py-1 border rounded focus:outline-none"
-    />
-  </div>
-);
-
-/* ===================== DATE RANGE ===================== */
-
-const DateRangeInput = ({ start, end, onChange }) => (
-  <div className="flex items-center gap-1 text-xs">
-    <input
-      type="date"
-      value={start || ""}
-      onChange={(e) => onChange(e.target.value, end)}
-      className="px-2 py-1 border rounded focus:outline-none"
-    />
-    <span>-</span>
-    <input
-      type="date"
-      value={end || ""}
-      onChange={(e) => onChange(start, e.target.value)}
-      className="px-2 py-1 border rounded focus:outline-none"
-    />
   </div>
 );
 
