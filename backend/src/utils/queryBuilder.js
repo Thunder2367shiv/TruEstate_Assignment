@@ -26,8 +26,45 @@ export const buildMongoQuery = (filters) => {
     if (filters.maxAge) query.a.$lte = Number(filters.maxAge);
   }
 
+  if (filters.dateRange) {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    let startDate;
+    let endDate = today;
+
+    switch (filters.dateRange) {
+      case 'Today':
+        startDate = new Date();
+        startDate.setHours(0, 0, 0, 0); 
+        break;
+      case 'Last 7 Days':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 7);
+        break;
+      case 'Last 30 Days':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 30);
+        break;
+      case 'This Month':
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1); 
+        break;
+      case 'Last Month':
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      default:
+        break;
+    }
+
+    if (startDate) {
+      query.d = { $gte: startDate, $lte: endDate };
+    }
+  }
+
   if (filters.startDate || filters.endDate) {
-    query.d = {};
+    if (!query.d) query.d = {}; 
     if (filters.startDate) query.d.$gte = new Date(filters.startDate);
     if (filters.endDate) query.d.$lte = new Date(filters.endDate);
   }

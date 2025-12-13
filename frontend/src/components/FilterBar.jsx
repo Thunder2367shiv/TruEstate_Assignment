@@ -10,8 +10,9 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
     paymentMethods: ["Credit Card", "Wallet", "UPI", "Cash"],
   };
 
-  const ageRanges = ["0–18", "19–25", "26–35", "36–45", "46–60", "60+"];
+  const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
 
+  // FIX: Ensure these match what your backend expects, or handle the conversion in the parent component
   const dateRanges = [
     "Today",
     "Last 7 Days",
@@ -59,7 +60,7 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
         onChange={(v) => onFilterChange("gender", v)}
       />
 
-      {/* Age Range (Selectable) */}
+      {/* Age Range */}
       <FilterSelect
         label="Age Range"
         value={filters.ageRange}
@@ -74,11 +75,11 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
         options={options.categories || defaults.categories}
         onChange={(v) => {
           onFilterChange("category", v);
-          onFilterChange("tags", "");
+          onFilterChange("tags", ""); // Reset tags when category changes
         }}
       />
 
-      {/* Tags (Disabled until category selected) */}
+      {/* Tags */}
       <FilterSelect
         label="Tags"
         value={filters.tags}
@@ -95,7 +96,7 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
         onChange={(v) => onFilterChange("paymentMethod", v)}
       />
 
-      {/* Date Range (Selectable) */}
+      {/* Date Range - Updated to pass correct key */}
       <FilterSelect
         label="Date Range"
         value={filters.dateRange}
@@ -106,7 +107,7 @@ const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
   );
 };
 
-/* ===================== SELECT ===================== */
+/* ===================== SELECT COMPONENT ===================== */
 
 const FilterSelect = ({
   label,
@@ -120,7 +121,7 @@ const FilterSelect = ({
       value={value || ""}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none transition
+      className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none transition cursor-pointer
         ${
           disabled
             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -130,10 +131,11 @@ const FilterSelect = ({
         }
       `}
     >
-      {/* NON-SELECTABLE HEADING */}
-      <option value="" disabled hidden>
-        {label}
-      </option>
+      {/* FIX: The previous "disabled hidden" option prevented the label from showing 
+         when the value was reset to empty string.
+         This logic now correctly shows the label as a placeholder.
+      */}
+      <option value="">{label}</option> 
 
       {options.map((opt) => (
         <option key={opt} value={opt}>
