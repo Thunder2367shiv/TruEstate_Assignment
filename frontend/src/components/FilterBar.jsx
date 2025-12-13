@@ -1,140 +1,188 @@
-import React, { useMemo } from 'react';
-import { RotateCcw, ChevronDown, X } from 'lucide-react'; 
+import React, { useMemo } from "react";
+import { RotateCcw, ChevronDown } from "lucide-react";
 
-const FilterBar = ({ filters, options, onFilterChange, onReset }) => {
-  
+/* ===================== FILTER BAR ===================== */
+
+const FilterBar = ({ filters, options = {}, onFilterChange, onReset }) => {
   const defaults = {
     regions: ["North", "South", "East", "West", "Central"],
     categories: ["Clothing", "Electronics", "Beauty"],
-    paymentMethods: ["Credit Card", "Wallet", "UPI", "Cash", "Debit Card", "Net Banking"],
-    tags: ["Sale", "New", "Discounted", "Popular", "organic", "skincare", "makeup", "fragrance-free", "unisex", "cotton", "fashion", "casual", "formal", "smart"]
-  };
-
-  const ageRanges = ["0-18", "19-25", "26-35", "36-45", "46-60", "60+"];
-  const dateRanges = ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "This Month"];
-
-  const getOptions = (apiData, fallbackData) => {
-    return (apiData && apiData.length > 0) ? apiData : fallbackData;
+    paymentMethods: ["Credit Card", "Wallet", "UPI", "Cash"],
   };
 
   const categoryTagsMap = {
-    "Beauty": ["organic", "skincare", "makeup", "fragrance-free"],
-    "Clothing": ["unisex", "cotton", "fashion", "casual", "formal"],
-    "Electronics": ["smart"],
+    Beauty: ["organic", "skincare", "makeup", "fragrance-free"],
+    Clothing: ["unisex", "cotton", "fashion", "casual", "formal"],
+    Electronics: ["smart"],
   };
 
   const visibleTags = useMemo(() => {
-    const allTags = getOptions(options.tags, defaults.tags);
-    if (filters.category && categoryTagsMap[filters.category]) {
-       const allowedTags = categoryTagsMap[filters.category];
-       return allTags.filter(tag => allowedTags.includes(tag));
-    }
-    return allTags;
-  }, [filters.category, options.tags]);
+    if (!filters.category) return [];
+    return categoryTagsMap[filters.category] || [];
+  }, [filters.category]);
 
   return (
-    <div className="bg-white p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center shadow-sm z-10">
-      <button 
+    <div className="bg-white p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center shadow-sm">
+
+      {/* Reset */}
+      <button
         onClick={onReset}
-        className="p-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 rounded-full transition-colors"
+        className="p-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 rounded-full"
         title="Reset Filters"
       >
         <RotateCcw size={16} />
       </button>
 
-      <FilterSelect 
-        label="Customer Region" 
-        value={filters.region} 
-        onChange={(val) => onFilterChange('region', val)}
-        options={getOptions(options.regions, defaults.regions)} 
-      />
-      
-      <FilterSelect 
-        label="Gender" 
-        value={filters.gender} 
-        onChange={(val) => onFilterChange('gender', val)}
-        options={['Male', 'Female']}
+      {/* Region */}
+      <FilterSelect
+        label="Customer Region"
+        value={filters.region}
+        options={options.regions || defaults.regions}
+        onChange={(v) => onFilterChange("region", v)}
       />
 
-      <FilterSelect 
-        label="Age Range" 
-        value={filters.ageRange} 
-        onChange={(val) => onFilterChange('ageRange', val)}
-        options={ageRanges} 
+      {/* Gender */}
+      <FilterSelect
+        label="Gender"
+        value={filters.gender}
+        options={["Male", "Female"]}
+        onChange={(v) => onFilterChange("gender", v)}
       />
 
-      <FilterSelect 
-        label="Product Category" 
-        value={filters.category} 
-        onChange={(val) => {
-            onFilterChange('category', val);
-            onFilterChange('tags', ''); 
+      {/* Age Range */}
+      <RangeInput
+        label="Age"
+        start={filters.ageFrom}
+        end={filters.ageTo}
+        onChange={(from, to) => {
+          onFilterChange("ageFrom", from);
+          onFilterChange("ageTo", to);
         }}
-        options={getOptions(options.categories, defaults.categories)}
       />
 
-      <FilterSelect 
-        label="Tags" 
-        value={filters.tags} 
-        onChange={(val) => onFilterChange('tags', val)}
-        options={visibleTags} 
+      {/* Category */}
+      <FilterSelect
+        label="Product Category"
+        value={filters.category}
+        options={options.categories || defaults.categories}
+        onChange={(v) => {
+          onFilterChange("category", v);
+          onFilterChange("tags", "");
+        }}
       />
 
-      <FilterSelect 
-        label="Payment Method" 
-        value={filters.paymentMethod} 
-        onChange={(val) => onFilterChange('paymentMethod', val)}
-        options={getOptions(options.paymentMethods, defaults.paymentMethods)}
+      {/* Tags (Disabled until category selected) */}
+      <FilterSelect
+        label="Tags"
+        value={filters.tags}
+        options={visibleTags}
+        disabled={!filters.category}
+        onChange={(v) => onFilterChange("tags", v)}
       />
 
-      <FilterSelect 
-        label="Date" 
-        value={filters.dateRange} 
-        onChange={(val) => onFilterChange('dateRange', val)}
-        options={dateRanges} 
+      {/* Payment Method */}
+      <FilterSelect
+        label="Payment Method"
+        value={filters.paymentMethod}
+        options={options.paymentMethods || defaults.paymentMethods}
+        onChange={(v) => onFilterChange("paymentMethod", v)}
       />
-      
-      <div className="ml-auto flex items-center gap-2">
-        <span className="text-sm text-gray-500 hidden sm:inline">Sort by:</span>
-        <select 
-          className="text-sm font-medium border-none focus:ring-0 cursor-pointer text-gray-700 bg-transparent hover:text-green-700 outline-none"
-          onChange={(e) => onFilterChange('sortBy', e.target.value)}
-          value={filters.sortBy || "date"}
-        >
-          <option value="name">Customer Name (A-Z)</option>
-          <option value="date">Date (Newest)</option>
-          <option value="quantity">Quantity (High-Low)</option>
-        </select>
-      </div>
+
+      {/* Date Range */}
+      <DateRangeInput
+        start={filters.startDate}
+        end={filters.endDate}
+        onChange={(from, to) => {
+          onFilterChange("startDate", from);
+          onFilterChange("endDate", to);
+        }}
+      />
     </div>
   );
 };
 
-const FilterSelect = ({ label, value, onChange, options = [] }) => (
-  <div className="relative group">
-    <select 
-      value={value || ""} 
+/* ===================== SELECT ===================== */
+
+const FilterSelect = ({
+  label,
+  value,
+  options = [],
+  onChange,
+  disabled = false,
+}) => (
+  <div className="relative">
+    <select
+      value={value || ""}
+      disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none focus:border-gray-400 transition-shadow cursor-pointer ${
-        value 
-          ? 'border-green-500 text-green-700 bg-green-50' 
-          : 'border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100' 
-      }`}
+      className={`appearance-none px-4 py-1.5 pr-8 border rounded-md text-xs font-medium focus:outline-none transition
+        ${
+          disabled
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : value
+            ? "border-green-500 bg-green-50 text-green-700"
+            : "border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100"
+        }
+      `}
     >
-      <option value="" className="text-gray-400">
-        {value ? `All ${label}s` : label}
+      {/* NON-SELECTABLE HEADING */}
+      <option value="" disabled hidden>
+        {label}
       </option>
-      
+
       {options.map((opt) => (
-        <option key={opt} value={opt} className="text-gray-900">
+        <option key={opt} value={opt}>
           {opt}
         </option>
       ))}
     </select>
-    
+
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <ChevronDown size={12} />
     </div>
+  </div>
+);
+
+/* ===================== AGE RANGE ===================== */
+
+const RangeInput = ({ label, start, end, onChange }) => (
+  <div className="flex items-center gap-1 text-xs">
+    <span className="text-gray-500">{label}</span>
+    <input
+      type="number"
+      placeholder="From"
+      value={start || ""}
+      onChange={(e) => onChange(e.target.value, end)}
+      className="w-16 px-2 py-1 border rounded focus:outline-none"
+    />
+    <span>-</span>
+    <input
+      type="number"
+      placeholder="To"
+      value={end || ""}
+      onChange={(e) => onChange(start, e.target.value)}
+      className="w-16 px-2 py-1 border rounded focus:outline-none"
+    />
+  </div>
+);
+
+/* ===================== DATE RANGE ===================== */
+
+const DateRangeInput = ({ start, end, onChange }) => (
+  <div className="flex items-center gap-1 text-xs">
+    <input
+      type="date"
+      value={start || ""}
+      onChange={(e) => onChange(e.target.value, end)}
+      className="px-2 py-1 border rounded focus:outline-none"
+    />
+    <span>-</span>
+    <input
+      type="date"
+      value={end || ""}
+      onChange={(e) => onChange(start, e.target.value)}
+      className="px-2 py-1 border rounded focus:outline-none"
+    />
   </div>
 );
 
